@@ -1,32 +1,25 @@
 pipeline {
-  agent any
-  tools {nodejs "node" }
+  agent {linux-node true}
   stages {
     stage('Cloning Git') {
       steps {
         git url: 'https://github.com/kmatthew02/node-webapp.git',
-        credentialsId: 'Git-2'
+        credentialsId: 'kmatthew02'
       }
     }
     stage('Build Container Image') {
       steps {
         agent{
-          dockerfile {
-              filename '$workspace/Dockerfile',
-              label 'node'              
+          linux-node {
+            checkout scm
+            def customImage = docker.build("my-image:${env.BUILD_ID}")
+            customImage.inside {
+              sh 'Heyyo:)'
+            }
           }
+          
         }
       }
     }
-    stage('Build') {
-       steps {
-         sh 'npm install'
-       }
-    }
-    stage('Test') {
-      steps {
-        sh "pwd"
-      }
-    }    
   }
 }
